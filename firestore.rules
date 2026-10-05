@@ -1,0 +1,150 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // 0. Global Safety Net
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // --- Helpers ---
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isEmailVerified() {
+      return isSignedIn() && request.auth.token.email_verified == true;
+    }
+
+    function isAdmin() {
+      return isSignedIn() && (
+        exists(/databases/$(database)/documents/admins/$(request.auth.uid)) ||
+        (request.auth.token.email == 'rahjinsun76@gmail.com' && request.auth.token.email_verified == true)
+      );
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() >= 1 && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    // --- Notice Validation ---
+    function isValidNotice(data) {
+      return (!('title' in data) || (data.title is string && data.title.size() >= 1 && data.title.size() <= 500)) &&
+             (!('date' in data) || (data.date is string && data.date.size() >= 1 && data.date.size() <= 20)) &&
+             (!('badge' in data) || (data.badge is string && data.badge.size() >= 1 && data.badge.size() <= 50)) &&
+             (!('content' in data) || (data.content is string && data.content.size() <= 10000));
+    }
+
+    // --- Gallery Validation ---
+    function isValidGalleryItem(data) {
+      return (!('src' in data) || (data.src is string && data.src.size() >= 1 && data.src.size() <= 1000000)) &&
+             (!('title' in data) || (data.title is string && data.title.size() >= 1 && data.title.size() <= 200)) &&
+             (!('category' in data) || (data.category is string && (data.category in ['성인', '아동', '노인', '자격증', '전체'])));
+    }
+
+    // --- Config Validation ---
+    function isValidConfig(data) {
+      return (!('heroBadge' in data) || (data.heroBadge is string && data.heroBadge.size() <= 200)) &&
+             (!('heroTitle1' in data) || (data.heroTitle1 is string && data.heroTitle1.size() <= 500)) &&
+             (!('heroTitle2' in data) || (data.heroTitle2 is string && data.heroTitle2.size() <= 500)) &&
+             (!('heroDesc' in data) || (data.heroDesc is string && data.heroDesc.size() <= 2000)) &&
+             (!('heroImage' in data) || (data.heroImage is string && data.heroImage.size() <= 1000000)) &&
+             (!('missionTitle' in data) || (data.missionTitle is string && data.missionTitle.size() <= 500)) &&
+             (!('missionSubtitle' in data) || (data.missionSubtitle is string && data.missionSubtitle.size() <= 1000)) &&
+             (!('missionDesc' in data) || (data.missionDesc is string && data.missionDesc.size() <= 5000)) &&
+             (!('missionImage' in data) || (data.missionImage is string && data.missionImage.size() <= 1000000)) &&
+             (!('aboutTitle' in data) || (data.aboutTitle is string && data.aboutTitle.size() <= 500)) &&
+             (!('aboutDesc' in data) || (data.aboutDesc is string && data.aboutDesc.size() <= 5000)) &&
+             (!('aboutImage' in data) || (data.aboutImage is string && data.aboutImage.size() <= 1000000)) &&
+             (!('certificationImage' in data) || (data.certificationImage is string && data.certificationImage.size() <= 1000000)) &&
+             (!('contactImage' in data) || (data.contactImage is string && data.contactImage.size() <= 1000000)) &&
+             (!('kakaoUrl' in data) || (data.kakaoUrl is string && data.kakaoUrl.size() <= 1000)) &&
+             (!('address' in data) || (data.address is string && data.address.size() <= 500)) &&
+             (!('memberCount' in data) || (data.memberCount is string && data.memberCount.size() <= 100)) &&
+             (!('programImages' in data) || data.programImages is map) &&
+             (!('programTitles' in data) || data.programTitles is map) &&
+             (!('programBullets' in data) || data.programBullets is map);
+    }
+
+    // --- Application Validation ---
+    function isValidApplication(data) {
+      return (!('name' in data) || (data.name is string && data.name.size() >= 1 && data.name.size() <= 100)) &&
+             (!('phone' in data) || (data.phone is string && data.phone.size() >= 1 && data.phone.size() <= 50)) &&
+             (!('email' in data) || (data.email is string && data.email.size() <= 200)) &&
+             (!('program' in data) || (data.program is string && data.program.size() >= 1 && data.program.size() <= 200)) &&
+             (!('message' in data) || (data.message is string && data.message.size() <= 5000)) &&
+             (!('status' in data) || (data.status is string && (data.status in ['pending', 'reviewed', 'completed'])));
+    }
+
+    // --- Collection: Notices ---
+    match /notices/{noticeId} {
+      allow list: if true;
+      allow get: if isValidId(noticeId);
+      allow create: if isAdmin() && isValidId(noticeId) &&
+                    incoming().keys().hasAll(['title', 'date', 'badge', 'createdAt']) &&
+                    incoming().keys().hasOnly(['title', 'date', 'badge', 'content', 'createdAt']) &&
+                    isValidNotice(incoming()) &&
+                    incoming().createdAt == request.time;
+      allow update: if isAdmin() && isValidId(noticeId) &&
+                    isValidNotice(incoming()) &&
+                    incoming().diff(existing()).affectedKeys().hasOnly(['title', 'date', 'badge', 'content', 'updatedAt']) &&
+                    incoming().updatedAt == request.time;
+      allow delete: if isAdmin() && isValidId(noticeId);
+    }
+
+    // --- Collection: Gallery ---
+    match /gallery/{itemId} {
+      allow list: if true;
+      allow get: if isValidId(itemId);
+      allow create: if isAdmin() && isValidId(itemId) &&
+                    incoming().keys().hasAll(['src', 'title', 'category', 'createdAt']) &&
+                    incoming().keys().hasOnly(['src', 'title', 'category', 'createdAt']) &&
+                    isValidGalleryItem(incoming()) &&
+                    incoming().createdAt == request.time;
+      allow update: if isAdmin() && isValidId(itemId) &&
+                    isValidGalleryItem(incoming()) &&
+                    incoming().diff(existing()).affectedKeys().hasOnly(['src', 'title', 'category', 'updatedAt']) &&
+                    incoming().updatedAt == request.time;
+      allow delete: if isAdmin() && isValidId(itemId);
+    }
+
+    // --- Collection: Admins (for RBAC) ---
+    match /admins/{adminId} {
+      allow get: if isSignedIn() && isValidId(adminId) && (request.auth.uid == adminId || isAdmin());
+      allow list: if isAdmin();
+      allow write: if false;
+    }
+
+    // --- Collection: Config (Dynamic Images & Stats) ---
+    match /config/main {
+      allow get: if true;
+      allow create, update: if isAdmin() && isValidConfig(incoming());
+      allow delete: if isAdmin();
+    }
+
+    // --- Collection: Applications ---
+    match /applications/{appId} {
+      allow get: if isAdmin() && isValidId(appId);
+      allow list: if isAdmin();
+      allow create: if isValidId(appId) &&
+                    incoming().keys().hasAll(['name', 'phone', 'email', 'program', 'message', 'status', 'createdAt']) &&
+                    incoming().keys().hasOnly(['name', 'phone', 'email', 'program', 'message', 'status', 'createdAt']) &&
+                    isValidApplication(incoming()) &&
+                    incoming().status == 'pending' &&
+                    incoming().createdAt == request.time;
+      allow update: if isAdmin() && isValidId(appId) &&
+                    isValidApplication(incoming()) &&
+                    incoming().diff(existing()).affectedKeys().hasOnly(['status', 'updatedAt']) &&
+                    incoming().updatedAt == request.time;
+      allow delete: if isAdmin() && isValidId(appId);
+    }
+  }
+}

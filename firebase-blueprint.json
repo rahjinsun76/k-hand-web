@@ -1,0 +1,264 @@
+{
+  "entities": {
+    "Notice": {
+      "title": "Notice",
+      "description": "Association announcements",
+      "type": "object",
+      "properties": {
+        "title": {
+          "type": "string",
+          "maxLength": 500,
+          "minLength": 1,
+          "description": "Heading of the notice"
+        },
+        "date": {
+          "type": "string",
+          "maxLength": 20,
+          "minLength": 1,
+          "description": "Display date (YYYY.MM.DD)"
+        },
+        "badge": {
+          "type": "string",
+          "maxLength": 50,
+          "minLength": 1,
+          "description": "Category badge (e.g., 중요, 교육, 이벤트)"
+        },
+        "content": {
+          "type": "string",
+          "maxLength": 10000,
+          "description": "Optional detailed content"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server side timestamp"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server side update timestamp"
+        }
+      },
+      "required": ["title", "date", "badge"]
+    },
+    "GalleryItem": {
+      "title": "Gallery Item",
+      "description": "Photos of association activities",
+      "type": "object",
+      "properties": {
+        "src": {
+          "type": "string",
+          "maxLength": 1000000,
+          "minLength": 1,
+          "description": "Image URL (base64 or hosted path)"
+        },
+        "title": {
+          "type": "string",
+          "maxLength": 200,
+          "minLength": 1,
+          "description": "Title of the work or activity"
+        },
+        "category": {
+          "type": "string",
+          "enum": ["성인", "아동", "노인", "자격증", "전체"],
+          "description": "Target group or category"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server side timestamp"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server side update timestamp"
+        }
+      },
+      "required": ["src", "title", "category"]
+    },
+    "AppStats": {
+      "title": "App Stats",
+      "description": "General stats and customizable text/images for the homepage",
+      "type": "object",
+      "properties": {
+        "memberCount": {
+          "type": "string",
+          "maxLength": 100,
+          "description": "Display string for member count (e.g., 1,200+)"
+        },
+        "heroBadge": {
+          "type": "string",
+          "maxLength": 200,
+          "description": "Hero section badge text"
+        },
+        "heroTitle1": {
+          "type": "string",
+          "maxLength": 500,
+          "description": "Hero section first title line"
+        },
+        "heroTitle2": {
+          "type": "string",
+          "maxLength": 500,
+          "description": "Hero section second title line"
+        },
+        "heroDesc": {
+          "type": "string",
+          "maxLength": 2000,
+          "description": "Hero section description"
+        },
+        "heroImage": {
+          "type": "string",
+          "maxLength": 1000000,
+          "description": "Main banner image"
+        },
+        "aboutTitle": {
+          "type": "string",
+          "maxLength": 500,
+          "description": "About section title"
+        },
+        "aboutDesc": {
+          "type": "string",
+          "maxLength": 5000,
+          "description": "About section description"
+        },
+        "aboutImage": {
+          "type": "string",
+          "maxLength": 1000000,
+          "description": "About section image"
+        },
+        "missionTitle": {
+          "type": "string",
+          "maxLength": 500,
+          "description": "Mission section title"
+        },
+        "missionSubtitle": {
+          "type": "string",
+          "maxLength": 1000,
+          "description": "Mission section subtitle"
+        },
+        "missionDesc": {
+          "type": "string",
+          "maxLength": 5000,
+          "description": "Mission section description"
+        },
+        "missionImage": {
+          "type": "string",
+          "maxLength": 1000000,
+          "description": "Mission section image"
+        },
+        "certificationImage": {
+          "type": "string",
+          "maxLength": 1000000,
+          "description": "Certification section image"
+        },
+        "contactImage": {
+          "type": "string",
+          "maxLength": 1000000,
+          "description": "Contact section image"
+        },
+        "kakaoUrl": {
+          "type": "string",
+          "maxLength": 1000,
+          "description": "KakaoTalk consultation link"
+        },
+        "address": {
+          "type": "string",
+          "maxLength": 500,
+          "description": "Association physical address"
+        },
+        "programImages": {
+          "type": "object",
+          "description": "Images for program targets"
+        },
+        "programTitles": {
+          "type": "object",
+          "description": "Titles for program targets"
+        },
+        "programBullets": {
+          "type": "object",
+          "description": "Bullet lists for program targets"
+        }
+      }
+    },
+    "Application": {
+      "title": "Application",
+      "description": "Course and consultation applications submitted by visitors",
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "maxLength": 100,
+          "minLength": 1,
+          "description": "Applicant full name"
+        },
+        "phone": {
+          "type": "string",
+          "maxLength": 50,
+          "minLength": 1,
+          "description": "Applicant contact phone number"
+        },
+        "email": {
+          "type": "string",
+          "maxLength": 200,
+          "description": "Applicant email address"
+        },
+        "program": {
+          "type": "string",
+          "maxLength": 200,
+          "minLength": 1,
+          "description": "Selected education program"
+        },
+        "message": {
+          "type": "string",
+          "maxLength": 5000,
+          "description": "Additional inquiry message"
+        },
+        "status": {
+          "type": "string",
+          "enum": ["pending", "reviewed", "completed"],
+          "description": "Processing status of the application"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server side submission timestamp"
+        }
+      },
+      "required": ["name", "phone", "program", "status"]
+    },
+    "Admin": {
+      "title": "Admin",
+      "description": "Administrator role record",
+      "type": "object",
+      "properties": {
+        "email": {
+          "type": "string",
+          "maxLength": 200,
+          "description": "Admin email address"
+        }
+      }
+    }
+  },
+  "firestore": {
+    "/notices/{noticeId}": {
+      "schema": "Notice",
+      "description": "Collection of all announcements"
+    },
+    "/gallery/{itemId}": {
+      "schema": "GalleryItem",
+      "description": "Collection of gallery photos"
+    },
+    "/config/main": {
+      "schema": "AppStats",
+      "description": "Homepage configuration and stats"
+    },
+    "/applications/{appId}": {
+      "schema": "Application",
+      "description": "Submitted education and consultation applications"
+    },
+    "/admins/{adminId}": {
+      "schema": "Admin",
+      "description": "Admin role lookup collection"
+    }
+  }
+}

@@ -1,0 +1,119 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+KR:wght@300;400;500;700&display=swap');
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+  --font-sans: "Inter", "Noto Sans KR", ui-sans-serif, system-ui, sans-serif;
+  --color-primary: #00897B;
+  --color-primary-dark: #00695C;
+  --color-secondary: #E0F2F1;
+}
+
+@layer base {
+  body {
+    @apply font-sans text-slate-900 bg-white transition-colors duration-300;
+  }
+
+  html.dark body {
+    @apply bg-slate-950 text-slate-100;
+  }
+}
+
+/* Global Dark Mode Surface & Typography Adaptation */
+html.dark section.bg-white {
+  background-color: #0b1120;
+}
+
+html.dark section.bg-slate-50 {
+  background-color: #0f172a;
+}
+
+html.dark nav.bg-white {
+  background-color: rgba(15, 23, 42, 0.95);
+  border-bottom: 1px solid #1e293b;
+}
+
+html.dark div.bg-white:not(.inline-block),
+html.dark a.bg-white:not(.text-primary) {
+  background-color: #1e293b;
+}
+
+html.dark a.bg-white.text-primary {
+  background-color: #1e293b;
+  color: #2dd4bf;
+  border-color: rgba(45, 212, 191, 0.25);
+}
+
+html.dark .bg-slate-50,
+html.dark .bg-slate-50\/80 {
+  background-color: #0f172a;
+}
+
+html.dark .bg-slate-100 {
+  background-color: #334155;
+}
+
+html.dark .text-slate-900,
+html.dark .text-slate-800 {
+  color: #f8fafc;
+}
+
+html.dark .text-slate-700,
+html.dark .text-slate-600 {
+  color: #cbd5e1;
+}
+
+html.dark .text-slate-500 {
+  color: #94a3b8;
+}
+
+html.dark section:not(#certification):not(#mission) .text-\[\#004D40\] {
+  color: #2dd4bf;
+}
+
+html.dark section:not(#certification):not(#mission) .bg-\[\#004D40\]\/5,
+html.dark section:not(#certification):not(#mission) .bg-\[\#004D40\]\/10 {
+  background-color: rgba(45, 212, 191, 0.12);
+}
+
+html.dark .border-white {
+  border-color: #1e293b;
+}
+
+html.dark .border-slate-50,
+html.dark .border-slate-100,
+html.dark .border-slate-100\/50,
+html.dark .border-slate-200,
+html.dark .border-slate-200\/80,
+html.dark .border-slate-200\/60 {
+  border-color: #334155;
+}
+
+html.dark .divide-slate-100 > :not([hidden]) ~ :not([hidden]) {
+  border-color: #334155;
+}
+
+html.dark input,
+html.dark select,
+html.dark textarea {
+  background-color: #0f172a;
+  color: #f8fafc;
+  border-color: #334155;
+}
+
+.section-container {
+  @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-16;
+}
+
+.h1-title {
+  @apply text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight text-primary;
+}
+
+.h2-title {
+  @apply text-2xl md:text-3xl font-bold text-primary mb-6;
+}
+
+.card-teal {
+  @apply bg-white rounded-2xl shadow-sm border border-secondary p-8 hover:shadow-md transition-shadow;
+}
