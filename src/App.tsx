@@ -976,6 +976,249 @@ const Programs = ({
   );
 };
 
+const Curriculum = ({ onOpenApply }: { onOpenApply: () => void }) => {
+  const grades = [
+    {
+      level: '3급',
+      stepNum: '01',
+      step: 'STEP 01 · 기초 과정',
+      title: '공예심리사 3급',
+      subtitle: '기초 이론 및 공예소재 이해',
+      subjects: ['공예심리 기초이론', '공예소재별 특징'],
+      highlights: [
+        '공예 활동의 치유적 개념과 심리학적 기초 이해',
+        '섬유·종이·자연물 등 다양한 공예소재별 감각 및 정서적 특징 파악',
+        '기초 공예활동 프로그램 수행 및 안내 역량 습득'
+      ]
+    },
+    {
+      level: '2급',
+      stepNum: '02',
+      step: 'STEP 02 · 심화 과정',
+      title: '공예심리사 2급',
+      subtitle: '대상별 집단활동 진행 및 실습',
+      subjects: ['대상별 공예심리', '공예 기반 프로그램 실습'],
+      highlights: [
+        '아동·청소년·성인·시니어 등 발달 및 대상별 심리 특성 이해',
+        '집단활동 프로그램의 회기별 진행 기법 및 보조 실무',
+        '대상 맞춤형 공예 기반 프로그램 매체 활용 실습'
+      ]
+    },
+    {
+      level: '1급',
+      stepNum: '03',
+      step: 'STEP 03 · 전문가 과정',
+      title: '공예심리사 1급',
+      subtitle: '프로그램 개발 및 강의·현장실습',
+      subjects: ['공예심리 프로그램 개발', '강의 및 현장실습'],
+      highlights: [
+        '기관 및 대상의 치유 목표에 맞춘 공예심리 프로그램 기획·개발',
+        '전문 강사로서의 교수 설계, 강의 시연 및 운영 노하우 전수',
+        '학교·기업·복지시설 등 실제 교육 현장을 연계한 현장실습 수행'
+      ]
+    }
+  ];
+
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.24,
+        delayChildren: 0.1
+      }
+    }
+  };
+
+  const cardVariants = {
+    hidden: { opacity: 0, y: 45, scale: 0.95 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      scale: 1,
+      transition: {
+        duration: 0.7,
+        ease: [0.16, 1, 0.3, 1]
+      }
+    }
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, x: -12 },
+    visible: {
+      opacity: 1,
+      x: 0,
+      transition: { duration: 0.4, ease: 'easeOut' }
+    }
+  };
+
+  return (
+    <section id="curriculum" className="bg-white py-24 border-t border-slate-100 overflow-hidden">
+      <div className="section-container">
+        <div className="max-w-6xl mx-auto">
+          <motion.div
+            initial={{ opacity: 0, y: 24 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, amount: 0.3 }}
+            transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+            className="text-center mb-14"
+          >
+            <h2 className="text-[#004D40] font-bold mb-4 tracking-widest uppercase text-sm">
+              Certification Curriculum
+            </h2>
+            <h3 className="text-3xl md:text-4xl font-bold text-slate-900 mb-6 break-keep">
+              공예심리사 3급 · 2급 · 1급 교육과정 안내
+            </h3>
+            <p className="text-slate-600 max-w-2xl mx-auto leading-relaxed break-keep text-base md:text-lg">
+              공예심리사 과정은 <strong>3급(기초) → 2급(심화) → 1급(전문가)</strong> 순차 이수제로 운영되며, 이론부터 현장실습까지 단계별로 탄탄하게 전문성을 완성합니다.
+            </p>
+          </motion.div>
+
+          {/* Animated Step Progress Line (Desktop) */}
+          <div className="hidden lg:block relative max-w-4xl mx-auto mb-10 px-12">
+            <div className="h-1 bg-slate-100 rounded-full overflow-hidden">
+              <motion.div
+                initial={{ scaleX: 0 }}
+                whileInView={{ scaleX: 1 }}
+                viewport={{ once: true, amount: 0.4 }}
+                transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1], delay: 0.2 }}
+                className="h-full bg-gradient-to-r from-[#004D40] via-primary to-emerald-400 origin-left"
+              />
+            </div>
+            <div className="flex justify-between -mt-4">
+              {grades.map((item, idx) => (
+                <motion.div
+                  key={item.level}
+                  initial={{ scale: 0, opacity: 0 }}
+                  whileInView={{ scale: 1, opacity: 1 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.45, delay: 0.2 + idx * 0.25, type: 'spring', stiffness: 220 }}
+                  className="flex items-center gap-2 bg-white px-3 py-1 rounded-full border border-primary/30 shadow-xs"
+                >
+                  <span className="w-6 h-6 rounded-full bg-[#004D40] text-white text-xs font-black flex items-center justify-center">
+                    {item.stepNum}
+                  </span>
+                  <span className="text-xs font-extrabold text-[#004D40]">{item.level}</span>
+                </motion.div>
+              ))}
+            </div>
+          </div>
+
+          {/* Coursework 3-Step Grid */}
+          <motion.div
+            variants={containerVariants}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.15 }}
+            className="grid lg:grid-cols-3 gap-8 relative"
+          >
+            {grades.map((item, idx) => (
+              <motion.div
+                key={item.level}
+                variants={cardVariants}
+                whileHover={{ y: -8, transition: { duration: 0.25 } }}
+                className="relative bg-slate-50/80 rounded-[32px] p-8 border border-slate-200/80 hover:border-primary/40 hover:shadow-xl transition-shadow flex flex-col justify-between group"
+              >
+                {/* Step Arrow Indicator between cards on Desktop */}
+                {idx < grades.length - 1 && (
+                  <motion.div
+                    initial={{ opacity: 0, x: -8 }}
+                    whileInView={{ opacity: 1, x: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: 0.45 + idx * 0.25, duration: 0.4 }}
+                    className="hidden lg:flex absolute -right-6 top-1/2 -translate-y-1/2 z-10 w-9 h-9 rounded-full bg-white border border-slate-200 shadow-md items-center justify-center text-primary"
+                  >
+                    <ArrowRight size={16} />
+                  </motion.div>
+                )}
+
+                <div>
+                  {/* Top Badge Row */}
+                  <div className="flex items-center justify-between gap-2 mb-6">
+                    <span className="text-xs font-extrabold tracking-wider text-[#004D40] bg-[#004D40]/10 px-3.5 py-1.5 rounded-full">
+                      {item.step}
+                    </span>
+                    <span className="text-xs font-black text-primary/40 group-hover:text-primary transition-colors">
+                      STEP {item.stepNum}
+                    </span>
+                  </div>
+
+                  {/* Title & Subtitle */}
+                  <div className="mb-6">
+                    <h4 className="text-2xl font-black text-slate-900 mb-1">{item.title}</h4>
+                    <p className="text-sm font-bold text-primary">{item.subtitle}</p>
+                  </div>
+
+                  {/* Subjects */}
+                  <div className="bg-white p-5 rounded-2xl border border-slate-100 mb-6 shadow-xs">
+                    <div className="flex flex-wrap gap-2">
+                      {item.subjects.map((subj) => (
+                        <motion.span
+                          key={subj}
+                          variants={itemVariants}
+                          className="text-xs font-bold bg-primary/10 text-[#004D40] px-3 py-1.5 rounded-xl border border-primary/20"
+                        >
+                          • {subj}
+                        </motion.span>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Key Learning Points */}
+                  <div className="space-y-2.5">
+                    <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">
+                      주요 학습 포인트
+                    </p>
+                    {item.highlights.map((pt, i) => (
+                      <motion.div
+                        key={i}
+                        variants={itemVariants}
+                        className="flex items-start gap-2.5 text-sm text-slate-600 leading-relaxed break-keep"
+                      >
+                        <span className="text-primary font-bold mt-0.5">✓</span>
+                        <span>{pt}</span>
+                      </motion.div>
+                    ))}
+                  </div>
+                </div>
+              </motion.div>
+            ))}
+          </motion.div>
+
+          {/* Unified Qualification Inquiry Banner */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+            className="mt-12 p-8 rounded-[32px] bg-[#004D40] text-white flex flex-col md:flex-row items-center justify-between gap-6 shadow-xl"
+          >
+            <div>
+              <span className="text-xs font-bold text-amber-300 uppercase tracking-widest block mb-1">
+                3급 → 2급 → 1급 단계별 자격 취득 과정
+              </span>
+              <h4 className="text-xl md:text-2xl font-extrabold mb-2 break-keep">
+                기초 이론부터 전문가 현장실습까지 체계적인 성장
+              </h4>
+              <p className="text-sm text-white/80 break-keep">
+                3급 통과 후 2급, 2급 통과 후 1급 과정으로 순차 진행됩니다. 개강 일정 및 수강 상담은 아래 버튼으로 문의해 주세요.
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={onOpenApply}
+              className="bg-white text-[#004D40] px-8 py-4 rounded-2xl font-extrabold text-sm hover:bg-white/90 transition-all shadow-lg shrink-0 cursor-pointer flex items-center gap-2"
+            >
+              <span>자격증 과정 문의·신청하기</span>
+              <ArrowRight size={16} />
+            </button>
+          </motion.div>
+        </div>
+      </div>
+    </section>
+  );
+};
+
 const HealingClasses = () => {
   const categories = [
     {
@@ -2768,6 +3011,7 @@ export default function App() {
           onEditProgramTitle={isAdmin ? handleEditProgramTitle : undefined}
           onEditProgramBullets={isAdmin ? handleEditProgramBullets : undefined}
         />
+        <Curriculum onOpenApply={() => setIsApplyModalOpen(true)} />
         <HealingClasses />
         <FAQ onOpenApply={() => setIsApplyModalOpen(true)} />
         <Certification 
