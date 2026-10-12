@@ -1063,9 +1063,10 @@ const Curriculum = ({ onOpenApply }: { onOpenApply: () => void }) => {
             transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
             className="text-center mb-14"
           >
-            <h2 className="text-[#004D40] font-bold mb-4 tracking-widest uppercase text-sm">
-              Certification Curriculum
-            </h2>
+            <div className="inline-flex items-center gap-2 bg-[#004D40]/10 text-[#004D40] px-4 py-1.5 rounded-full text-xs font-extrabold mb-4 border border-[#004D40]/15">
+              <Award size={15} className="text-primary shrink-0" />
+              <span>민간자격 등록번호 제 2026-007480호</span>
+            </div>
             <h3 className="text-3xl md:text-4xl font-bold text-slate-900 mb-6 break-keep">
               공예심리사 3급 · 2급 · 1급 교육과정 안내
             </h3>
@@ -1195,7 +1196,7 @@ const Curriculum = ({ onOpenApply }: { onOpenApply: () => void }) => {
           >
             <div>
               <span className="text-xs font-bold text-amber-300 uppercase tracking-widest block mb-1">
-                3급 → 2급 → 1급 단계별 자격 취득 과정
+                3급 → 2급 → 1급 단계별 자격 취득 과정 · 민간자격 등록번호 제 2026-007480호
               </span>
               <h4 className="text-xl md:text-2xl font-extrabold mb-2 break-keep">
                 기초 이론부터 전문가 현장실습까지 체계적인 성장
@@ -1457,7 +1458,11 @@ const Certification = ({ config, onEditImage, onOpenApply, isAdmin, onOpenAdminV
                viewport={{ once: true }}
                className="flex-1"
             >
-               <h2 className="text-primary-foreground/60 font-bold mb-4 tracking-widest uppercase">Professional</h2>
+               <h2 className="text-primary-foreground/60 font-bold mb-3 tracking-widest uppercase">Professional</h2>
+               <div className="inline-flex items-center gap-2 bg-white/10 border border-amber-300/40 text-amber-300 px-4 py-1.5 rounded-full text-xs font-extrabold mb-4">
+                 <Award size={15} className="shrink-0" />
+                 <span>민간자격 등록번호 제 2026-007480호</span>
+               </div>
                <h3 className="text-2xl md:text-3xl font-bold mb-8 break-keep">
                  공예심리사 자격증 과정{' '}
                  <motion.span 
@@ -2057,8 +2062,8 @@ const Mission = ({ config, onEditImage, onEditText }: { config: any, onEditImage
 
               <div className="space-y-2.5">
                 {[
-                  "임상심리사 2급 · 예술학석사(예술치료)",
-                  "단국대학교 문화예술대학원 예술치료",
+                  "예술학석사 (단국대학교 문화예술대학원 예술치료)",
+                  "국가공인자격 임상심리사 취득",
                   "단국대학교 전통복식 전공 대학원 수학(修學)",
                   "한복학원 원장"
                 ].map((item, idx) => (
@@ -3059,9 +3064,13 @@ export default function App() {
                 <p className="text-slate-500 leading-relaxed max-w-xs break-keep mb-3">
                     한국공예치료사 협회는 공예를 통해 사람의 마음을 치유하고 더 나은 삶을 만드는 전문가 집단입니다.
                 </p>
-                <p className="text-xs text-slate-400 flex items-center gap-1.5 break-keep">
+                <p className="text-xs text-slate-400 flex items-center gap-1.5 break-keep mb-2">
                   <MapPin size={14} className="text-primary shrink-0" />
                   <span>{config?.address || "성남시 분당구 돌마로80 2층 145호,146호"}</span>
+                </p>
+                <p className="text-xs text-slate-400 flex items-center gap-1.5 break-keep">
+                  <Award size={14} className="text-primary shrink-0" />
+                  <span>민간자격 등록번호 제 2026-007480호 (공예심리사)</span>
                 </p>
               </div>
               <div className="grid grid-cols-2 gap-8 md:col-span-2">
