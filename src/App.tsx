@@ -1463,16 +1463,16 @@ const Certification = ({ config, onEditImage, onOpenApply, isAdmin, onOpenAdminV
                  <Award size={15} className="shrink-0" />
                  <span>민간자격 등록번호 제 2026-007480호</span>
                </div>
-               <h3 className="text-2xl md:text-3xl font-bold mb-8 break-keep">
-                 공예심리사 자격증 과정{' '}
-                 <motion.span 
-                   animate={{ opacity: [1, 0, 1] }}
-                   transition={{ duration: 0.8, repeat: Infinity, ease: "easeInOut" }}
-                   className="text-amber-300 ml-2"
-                 >
-                   27년 2월 오픈
-                 </motion.span>
-               </h3>
+                 <h3 className="text-2xl md:text-3xl font-bold mb-8 break-keep">
+                   공예심리사 자격증 과정{' '}
+                   <motion.span 
+                     animate={{ opacity: [1, 0, 1] }}
+                     transition={{ duration: 0.8, repeat: Infinity, ease: "easeInOut" }}
+                     className="text-amber-300 ml-2"
+                   >
+                     2027년 3월 오픈
+                   </motion.span>
+                 </h3>
                <p className="text-white/70 text-base mb-10 leading-relaxed max-w-xl break-keep">
                   이론부터 실전 현장 적용까지, 전문 강사진의 노하우를 직접 전수받습니다. 
                   자격증 취득 후 활발한 활동을 하실 수 있도록 협회가 든든한 파트너가 됩니다.
