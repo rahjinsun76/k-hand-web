@@ -1750,15 +1750,17 @@ const AdminViewApplicationsModal = ({
                 </div>
                 <div className="grid md:grid-cols-2 gap-4 text-sm text-slate-500 mb-4">
                   <div className="flex items-center gap-2">
-                    <Phone size={14} className="text-primary" /> {app.phone}
+                    <Phone size={14} className="text-primary shrink-0" />
+                    <span className="font-semibold text-slate-700">{app.phone}</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <Mail size={14} className="text-primary" /> {app.email || "미입력"}
+                    <MapPin size={14} className="text-primary shrink-0" />
+                    <span>{app.email || "미입력"}</span>
                   </div>
                 </div>
                 {app.message && (
-                  <div className="bg-white p-4 rounded-2xl text-sm text-slate-600 leading-relaxed border border-slate-100 italic">
-                    "{app.message}"
+                  <div className="bg-white p-5 rounded-2xl text-sm text-slate-700 leading-relaxed border border-slate-100 whitespace-pre-line">
+                    {app.message}
                   </div>
                 )}
                 <div className="mt-4 text-[10px] text-slate-300 font-mono">
@@ -1772,6 +1774,7 @@ const AdminViewApplicationsModal = ({
     </div>
   );
 };
+
 const ApplicationFormModal = ({
   isOpen,
   onClose
@@ -1779,29 +1782,119 @@ const ApplicationFormModal = ({
   isOpen: boolean;
   onClose: () => void;
 }) => {
-  const [formData, setFormData] = useState({
-    name: '',
-    phone: '',
-    email: '',
-    program: '자격증 과정',
-    message: ''
-  });
+  const [name, setName] = useState('');
+  const [phone, setPhone] = useState('');
+  const [region, setRegion] = useState('');
+  const [schedule, setSchedule] = useState('평일·주말 모두 가능');
+  const [experiences, setExperiences] = useState<string[]>([]);
+  const [reasons, setReasons] = useState<string[]>([]);
+  const [channel, setChannel] = useState('');
+  const [note, setNote] = useState('');
+  const [privacyAgreed, setPrivacyAgreed] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSubmitted, setIsSubmitted] = useState(false);
+  const [errorMsg, setErrorMsg] = useState('');
+
+  const scheduleOptions = [
+    '평일반',
+    '주말반',
+    '평일·주말 모두 가능'
+  ];
+
+  const experienceOptions = [
+    '관련 경험 없음',
+    '공예·미술 관련 경험',
+    '심리·상담·예술치료 관련 경험',
+    '강의 및 프로그램 운영 경험'
+  ];
+
+  const reasonOptions = [
+    '전문성 향상 및 자기계발',
+    '학교·복지관·기관 강의 활동',
+    '공예심리 프로그램 운영',
+    '새로운 진로 탐색'
+  ];
+
+  const channelOptions = [
+    '네이버 검색',
+    '인스타그램·스레드',
+    '블로그',
+    '지인 소개',
+    '기타'
+  ];
+
+  const toggleExperience = (option: string) => {
+    if (option === '관련 경험 없음') {
+      setExperiences(prev => prev.includes('관련 경험 없음') ? [] : ['관련 경험 없음']);
+      return;
+    }
+    setExperiences(prev => {
+      const filtered = prev.filter(item => item !== '관련 경험 없음');
+      return filtered.includes(option)
+        ? filtered.filter(item => item !== option)
+        : [...filtered, option];
+    });
+  };
+
+  const toggleReason = (option: string) => {
+    setReasons(prev =>
+      prev.includes(option) ? prev.filter(item => item !== option) : [...prev, option]
+    );
+  };
+
+  const resetForm = () => {
+    setName('');
+    setPhone('');
+    setRegion('');
+    setSchedule('평일·주말 모두 가능');
+    setExperiences([]);
+    setReasons([]);
+    setChannel('');
+    setNote('');
+    setPrivacyAgreed(false);
+    setErrorMsg('');
+    setIsSubmitted(false);
+  };
+
+  const handleClose = () => {
+    resetForm();
+    onClose();
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!formData.name || !formData.phone) {
-      alert("이름과 연락처는 필수입력 항목입니다.");
+    setErrorMsg('');
+
+    if (!name.trim() || !phone.trim() || !region.trim() || !schedule) {
+      setErrorMsg('이름, 연락처, 거주지역, 희망 수업 일정은 필수 입력 항목입니다.');
       return;
     }
+    if (!privacyAgreed) {
+      setErrorMsg('수강 안내 및 상담을 위한 개인정보 수집·이용에 동의해 주세요.');
+      return;
+    }
+
+    const formattedMessage = [
+      `• 거주지역: ${region.trim()}`,
+      `• 희망 수업 일정: ${schedule}`,
+      `• 관련 경험: ${experiences.length > 0 ? experiences.join(', ') : '미선택'}`,
+      `• 참여 이유: ${reasons.length > 0 ? reasons.join(', ') : '미선택'}`,
+      `• 알게 된 경로: ${channel || '미선택'}`,
+      note.trim() ? `• 문의 및 참고사항: ${note.trim()}` : ''
+    ].filter(Boolean).join('\n');
+
     setIsSubmitting(true);
     try {
-      await addApplication(formData);
-      alert("신청이 성공적으로 완료되었습니다. 곧 담당자가 연락드리겠습니다.");
-      onClose();
-      setFormData({ name: '', phone: '', email: '', program: '자격증 과정', message: '' });
+      await addApplication({
+        name: name.trim(),
+        phone: phone.trim(),
+        email: `${region.trim()} · ${schedule}`,
+        program: '공예심리사 자격과정 (2027년 3월 초 개강)',
+        message: formattedMessage
+      });
+      setIsSubmitted(true);
     } catch (err) {
-      alert("신청 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.");
+      setErrorMsg('신청 접수 중 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.');
       console.error(err);
     } finally {
       setIsSubmitting(false);
@@ -1811,91 +1904,283 @@ const ApplicationFormModal = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-[200] flex items-center justify-center p-6">
+    <div
+      className="fixed inset-0 bg-black/80 backdrop-blur-sm z-[200] flex items-center justify-center p-4 sm:p-6"
+      onClick={handleClose}
+    >
       <motion.div 
-        initial={{ opacity: 0, scale: 0.9 }}
-        animate={{ opacity: 1, scale: 1 }}
-        className="bg-white rounded-[40px] p-8 md:p-12 w-full max-w-xl shadow-2xl overflow-y-auto max-h-[90vh]"
+        initial={{ opacity: 0, scale: 0.95, y: 12 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        onClick={(e) => e.stopPropagation()}
+        className="bg-white rounded-[36px] p-6 sm:p-10 w-full max-w-2xl shadow-2xl overflow-y-auto max-h-[92vh] relative"
       >
-        <div className="flex justify-between items-center mb-8">
+        {/* Modal Header */}
+        <div className="flex justify-between items-start gap-4 pb-6 mb-6 border-b border-slate-100">
           <div>
-            <h3 className="text-3xl font-black text-slate-900 tracking-tight">교육 신청하기</h3>
-            <p className="text-slate-400 mt-2 font-medium">손끝으로 전하는 따뜻한 치유의 시작</p>
+            <span className="inline-flex items-center gap-1.5 text-xs font-extrabold text-[#004D40] bg-[#004D40]/10 px-3 py-1 rounded-full mb-2.5">
+              <Award size={14} className="text-primary shrink-0" />
+              <span>한국공예치료사협회 · 민간자격 등록번호 제 2026-007480호</span>
+            </span>
+            <h3 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight break-keep">
+              공예심리사 자격과정 수강 신청
+            </h3>
+            <p className="text-sm sm:text-base text-primary font-extrabold mt-1.5 flex items-center gap-2">
+              <span>2027년 3월 초 개강 예정 · 분당·강남</span>
+            </p>
           </div>
-          <button onClick={onClose} className="text-slate-400 hover:text-slate-600 p-2 bg-slate-50 rounded-full"><X size={28} /></button>
+          <button
+            type="button"
+            onClick={handleClose}
+            className="text-slate-400 hover:text-slate-600 p-2 bg-slate-100 rounded-full transition-colors cursor-pointer shrink-0"
+          >
+            <X size={22} />
+          </button>
         </div>
-        
-        <form onSubmit={handleSubmit} className="space-y-6">
-          <div className="grid md:grid-cols-2 gap-6">
+
+        {isSubmitted ? (
+          <div className="py-12 text-center space-y-5">
+            <div className="w-16 h-16 rounded-full bg-primary/15 text-primary flex items-center justify-center mx-auto">
+              <Check size={34} />
+            </div>
+            <h4 className="text-2xl font-black text-slate-900">
+              수강 신청이 정상적으로 접수되었습니다!
+            </h4>
+            <p className="text-slate-600 text-sm sm:text-base leading-relaxed max-w-md mx-auto break-keep">
+              남겨주신 연락처로 공예심리사 자격과정 상세 일정 및 안내를 순차적으로 연락드리겠습니다. 감사합니다.
+            </p>
+            <div className="pt-4">
+              <button
+                type="button"
+                onClick={handleClose}
+                className="px-10 py-4 rounded-2xl bg-[#004D40] text-white font-bold text-sm hover:bg-[#00382e] transition-all cursor-pointer shadow-lg"
+              >
+                확인 및 닫기
+              </button>
+            </div>
+          </div>
+        ) : (
+          <form onSubmit={handleSubmit} className="space-y-7">
+            {/* 1. 이름 & 2. 연락처 */}
+            <div className="grid sm:grid-cols-2 gap-5">
+              <div className="space-y-2">
+                <label className="block text-sm font-extrabold text-slate-800">
+                  1. 이름 <span className="text-red-500">*</span>
+                </label>
+                <input 
+                  type="text" 
+                  required
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  placeholder="성함을 입력해 주세요"
+                  className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3.5 text-sm focus:ring-2 focus:ring-primary focus:outline-none transition-all"
+                />
+              </div>
+              <div className="space-y-2">
+                <label className="block text-sm font-extrabold text-slate-800">
+                  2. 연락처 <span className="text-red-500">*</span>
+                </label>
+                <input 
+                  type="tel" 
+                  required
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
+                  placeholder="010-0000-0000"
+                  className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3.5 text-sm focus:ring-2 focus:ring-primary focus:outline-none transition-all"
+                />
+              </div>
+            </div>
+
+            {/* 3. 거주지역 */}
             <div className="space-y-2">
-              <label className="text-sm font-bold text-slate-500 ml-1">이름 *</label>
+              <label className="block text-sm font-extrabold text-slate-800">
+                3. 거주지역 <span className="text-red-500">*</span>
+              </label>
               <input 
                 type="text" 
                 required
-                value={formData.name}
-                onChange={(e) => setFormData({...formData, name: e.target.value})}
-                placeholder="홍길동"
-                className="form-input w-full bg-slate-50 border-none rounded-2xl p-4 focus:ring-2 focus:ring-primary transition-all"
+                value={region}
+                onChange={(e) => setRegion(e.target.value)}
+                placeholder="예: 성남시 분당구, 서울시 강남구 등"
+                className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3.5 text-sm focus:ring-2 focus:ring-primary focus:outline-none transition-all"
               />
             </div>
+
+            {/* 4. 희망 수업 일정 */}
+            <div className="space-y-2.5">
+              <label className="block text-sm font-extrabold text-slate-800">
+                4. 희망 수업 일정 <span className="text-red-500">*</span>
+              </label>
+              <div className="grid sm:grid-cols-3 gap-2.5">
+                {scheduleOptions.map((opt) => {
+                  const selected = schedule === opt;
+                  return (
+                    <button
+                      key={opt}
+                      type="button"
+                      onClick={() => setSchedule(opt)}
+                      className={`py-3.5 px-4 rounded-2xl text-sm font-bold border text-center transition-all cursor-pointer flex items-center justify-center gap-2 ${
+                        selected
+                          ? 'bg-[#004D40] text-white border-[#004D40] shadow-md'
+                          : 'bg-slate-50 text-slate-700 border-slate-200 hover:border-primary/40'
+                      }`}
+                    >
+                      <span className={`w-4 h-4 rounded-full border flex items-center justify-center shrink-0 ${
+                        selected ? 'border-white bg-white text-[#004D40]' : 'border-slate-300'
+                      }`}>
+                        {selected && <Check size={11} strokeWidth={3} />}
+                      </span>
+                      <span>{opt}</span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* 5. 공예·심리·상담 관련 경험 (복수 선택 가능) */}
+            <div className="space-y-2.5">
+              <div className="flex items-baseline justify-between">
+                <label className="block text-sm font-extrabold text-slate-800">
+                  5. 공예·심리·상담 관련 경험
+                </label>
+                <span className="text-xs text-slate-400 font-semibold">중복 선택 가능</span>
+              </div>
+              <div className="grid sm:grid-cols-2 gap-2.5">
+                {experienceOptions.map((opt) => {
+                  const selected = experiences.includes(opt);
+                  return (
+                    <button
+                      key={opt}
+                      type="button"
+                      onClick={() => toggleExperience(opt)}
+                      className={`py-3 px-4 rounded-2xl text-sm font-semibold border text-left transition-all cursor-pointer flex items-center gap-2.5 ${
+                        selected
+                          ? 'bg-primary/10 text-[#004D40] border-primary font-bold'
+                          : 'bg-slate-50 text-slate-700 border-slate-200 hover:border-primary/40'
+                      }`}
+                    >
+                      <span className={`w-4 h-4 rounded-md border flex items-center justify-center shrink-0 ${
+                        selected ? 'border-primary bg-primary text-white' : 'border-slate-300 bg-white'
+                      }`}>
+                        {selected && <Check size={12} strokeWidth={3} />}
+                      </span>
+                      <span className="break-keep">{opt}</span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* 6. 자격과정에 참여하려는 이유 (복수 선택 가능) */}
+            <div className="space-y-2.5">
+              <div className="flex items-baseline justify-between">
+                <label className="block text-sm font-extrabold text-slate-800">
+                  6. 자격과정에 참여하려는 이유
+                </label>
+                <span className="text-xs text-slate-400 font-semibold">중복 선택 가능</span>
+              </div>
+              <div className="grid sm:grid-cols-2 gap-2.5">
+                {reasonOptions.map((opt) => {
+                  const selected = reasons.includes(opt);
+                  return (
+                    <button
+                      key={opt}
+                      type="button"
+                      onClick={() => toggleReason(opt)}
+                      className={`py-3 px-4 rounded-2xl text-sm font-semibold border text-left transition-all cursor-pointer flex items-center gap-2.5 ${
+                        selected
+                          ? 'bg-primary/10 text-[#004D40] border-primary font-bold'
+                          : 'bg-slate-50 text-slate-700 border-slate-200 hover:border-primary/40'
+                      }`}
+                    >
+                      <span className={`w-4 h-4 rounded-md border flex items-center justify-center shrink-0 ${
+                        selected ? 'border-primary bg-primary text-white' : 'border-slate-300 bg-white'
+                      }`}>
+                        {selected && <Check size={12} strokeWidth={3} />}
+                      </span>
+                      <span className="break-keep">{opt}</span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* 7. 협회를 알게 된 경로 */}
+            <div className="space-y-2.5">
+              <label className="block text-sm font-extrabold text-slate-800">
+                7. 협회를 알게 된 경로
+              </label>
+              <div className="flex flex-wrap gap-2">
+                {channelOptions.map((opt) => {
+                  const selected = channel === opt;
+                  return (
+                    <button
+                      key={opt}
+                      type="button"
+                      onClick={() => setChannel(selected ? '' : opt)}
+                      className={`py-2.5 px-4 rounded-xl text-xs sm:text-sm font-bold border transition-all cursor-pointer ${
+                        selected
+                          ? 'bg-[#004D40] text-white border-[#004D40] shadow-xs'
+                          : 'bg-slate-50 text-slate-600 border-slate-200 hover:border-primary/40'
+                      }`}
+                    >
+                      {opt}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* 8. 문의사항 및 참고사항 (선택) */}
             <div className="space-y-2">
-              <label className="text-sm font-bold text-slate-500 ml-1">연락처 *</label>
-              <input 
-                type="tel" 
-                required
-                value={formData.phone}
-                onChange={(e) => setFormData({...formData, phone: e.target.value})}
-                placeholder="010-0000-0000"
-                className="form-input w-full bg-slate-50 border-none rounded-2xl p-4 focus:ring-2 focus:ring-primary transition-all"
+              <label className="block text-sm font-extrabold text-slate-800">
+                8. 문의사항 및 참고사항 <span className="text-xs font-normal text-slate-400">(선택)</span>
+              </label>
+              <textarea 
+                rows={3}
+                value={note}
+                onChange={(e) => setNote(e.target.value)}
+                placeholder="궁금하신 점이나 참고사항이 있다면 자유롭게 적어주세요."
+                className="w-full bg-slate-50 border border-slate-200 rounded-2xl p-4 text-sm focus:ring-2 focus:ring-primary focus:outline-none transition-all resize-none"
               />
             </div>
-          </div>
-          
-          <div className="space-y-2">
-            <label className="text-sm font-bold text-slate-500 ml-1">이메일 주소</label>
-            <input 
-              type="email" 
-              value={formData.email}
-              onChange={(e) => setFormData({...formData, email: e.target.value})}
-              placeholder="example@email.com"
-              className="form-input w-full bg-slate-50 border-none rounded-2xl p-4 focus:ring-2 focus:ring-primary transition-all"
-            />
-          </div>
 
-          <div className="space-y-2">
-            <label className="text-sm font-bold text-slate-500 ml-1">관심 교육 과정</label>
-            <select 
-              value={formData.program}
-              onChange={(e) => setFormData({...formData, program: e.target.value})}
-              className="form-input w-full bg-slate-50 border-none rounded-2xl p-4 focus:ring-2 focus:ring-primary appearance-none transition-all"
+            {/* 개인정보 수집·이용 동의 */}
+            <div className="pt-1">
+              <button
+                type="button"
+                onClick={() => setPrivacyAgreed(!privacyAgreed)}
+                className="w-full p-4 rounded-2xl bg-slate-50 border border-slate-200 flex items-center gap-3 text-left cursor-pointer hover:border-primary/40 transition-all"
+              >
+                <span className={`w-5 h-5 rounded-md border flex items-center justify-center shrink-0 transition-colors ${
+                  privacyAgreed ? 'bg-[#004D40] border-[#004D40] text-white' : 'bg-white border-slate-300'
+                }`}>
+                  {privacyAgreed && <Check size={14} strokeWidth={3} />}
+                </span>
+                <span className="text-xs sm:text-sm text-slate-700 font-semibold break-keep">
+                  <strong className="text-[#004D40]">[필수]</strong> 수강 안내 및 상담을 위한 개인정보(이름, 연락처, 거주지역) 수집·이용에 동의합니다.
+                </span>
+              </button>
+            </div>
+
+            {errorMsg && (
+              <p className="text-xs sm:text-sm font-bold text-red-600 bg-red-50 border border-red-200 rounded-xl px-4 py-3">
+                {errorMsg}
+              </p>
+            )}
+
+            <button 
+              type="submit"
+              disabled={isSubmitting}
+              className={`w-full py-4 sm:py-5 rounded-2xl font-black text-base sm:text-lg text-white shadow-xl transition-all cursor-pointer ${
+                isSubmitting
+                  ? 'bg-slate-300'
+                  : 'bg-[#004D40] hover:bg-[#00382e] shadow-[#004D40]/20 active:scale-[0.99]'
+              }`}
             >
-              <option>자격증 과정</option>
-              <option>성인 힐링 클래스</option>
-              <option>노인 대상 치유</option>
-              <option>아동 창의 공예</option>
-              <option>기업/기관 단체 출강</option>
-            </select>
-          </div>
-
-          <div className="space-y-2">
-            <label className="text-sm font-bold text-slate-500 ml-1">문의 및 신청 내용</label>
-            <textarea 
-              rows={4}
-              value={formData.message}
-              onChange={(e) => setFormData({...formData, message: e.target.value})}
-              placeholder="기타 궁금하신 점이나 구체적인 신청 내용을 적어주세요."
-              className="form-input w-full bg-slate-50 border-none rounded-2xl p-4 focus:ring-2 focus:ring-primary transition-all resize-none"
-            />
-          </div>
-
-          <button 
-            type="submit"
-            disabled={isSubmitting}
-            className={`w-full py-5 rounded-[24px] font-black text-xl text-white shadow-xl transition-all shadow-primary/20 ${isSubmitting ? 'bg-slate-300' : 'bg-primary hover:bg-primary-dark hover:scale-[1.02]'}`}
-          >
-            {isSubmitting ? '전송 중...' : '신청서 제출하기'}
-          </button>
-        </form>
+              {isSubmitting ? '접수 중...' : '수강 신청서 제출하기'}
+            </button>
+          </form>
+        )}
       </motion.div>
     </div>
   );
